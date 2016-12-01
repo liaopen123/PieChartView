@@ -9,6 +9,8 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.HashMap;
+
 /**
  * Created by liaopenghui on 2016/12/1.
  */
@@ -56,8 +58,19 @@ public class PieChartView extends View {
        canvas.drawArc(rectF,-90,90,true,paint);
         paint.setColor(Color.YELLOW);
         paint.setStrokeWidth(10);
-        int pointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * 1 / 180));
-        int pointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * 1 / 180));
+        int pointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * 0.25*360/ 180));
+        int pointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * 0.25*360 / 180));
         canvas.drawLine(centerPoint.x,centerPoint.y,pointX,pointY,paint);
+    }
+
+
+
+    /**
+     * 设置进度
+     *
+     * @param percent 各个成分的百分比
+     */
+    public void setData(HashMap<Double,Color> percent) {
+
     }
 }
