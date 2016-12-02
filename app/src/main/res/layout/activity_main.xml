@@ -10,7 +10,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.xiaoziqianbao.piechartview.MainActivity">
 
-<com.xiaoziqianbao.piechartview.PieChartView
-    android:layout_width="300dp"
-    android:layout_height="300dp" />
+    <Button
+        android:id="@+id/btn"
+        android:text="生成"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoziqianbao.piechartview.PieChartView
+        android:id="@+id/piechart"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

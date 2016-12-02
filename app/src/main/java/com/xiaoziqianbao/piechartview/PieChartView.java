@@ -2,20 +2,21 @@ package com.xiaoziqianbao.piechartview;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * Created by liaopenghui on 2016/12/1.
  */
 
 public class PieChartView extends View {
+    private static final String TAG = "PieChartView";
     private int mWidth;
     private int mHeight;
     private int defaultWidth;
@@ -23,7 +24,11 @@ public class PieChartView extends View {
     private Point centerPoint ;//圆心
     private int mRadius;
     private Paint paint;
+    private double mIncrease = 0.001d;
+    double percent = 0;//初始化百分比
+    public int totalArc=0;
     private RectF rectF = new RectF();//圆所对应的弧
+    private ArrayList<PiePartBean> piePartBeanArrayList = new ArrayList<>();
 
     public PieChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -46,21 +51,26 @@ public class PieChartView extends View {
         rectF.top = centerPoint.y - mRadius;// 左上角y == 圆心y-半径
         rectF.right = centerPoint.x + mRadius; // 左下角x
         rectF.bottom = centerPoint.y + mRadius; // 右下角y
+        paint = new Paint();
+        paint.setAntiAlias(true);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.RED);
+
         //4个参数： 画弧对应的椭圆  起始的角度  划过的弧度，端点连圆心 还是相连  对应的paint
-       canvas.drawArc(rectF,-90,90,true,paint);
-        paint.setColor(Color.YELLOW);
-        paint.setStrokeWidth(10);
-        int pointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * 0.25*360/ 180));
-        int pointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * 0.25*360 / 180));
-        canvas.drawLine(centerPoint.x,centerPoint.y,pointX,pointY,paint);
+
+
+        for(int i = 0;i<piePartBeanArrayList.size();i++){
+           // Log.d(TAG,"i="+i+"piePartBeanArrayList.get(i).arc"+piePartBeanArrayList.get(i).arc+"piePartBeanArrayList.get(i).endPoint"+piePartBeanArrayList.get(i).endPointX);
+            canvas.drawArc(rectF,piePartBeanArrayList.get(i).startArc,piePartBeanArrayList.get(i).moveArc,true,paint);
+            Log.d(TAG,i+"..."+piePartBeanArrayList.get(i).startArc+"....."+piePartBeanArrayList.get(i).moveArc);
+            paint.setColor(piePartBeanArrayList.get(i).color);
+            paint.setStrokeWidth(10);
+         //   canvas.drawLine(centerPoint.x,centerPoint.y,piePartBeanArrayList.get(i).endPointX,piePartBeanArrayList.get(i).endPointY,paint);
+        }
+
     }
 
 
@@ -68,9 +78,89 @@ public class PieChartView extends View {
     /**
      * 设置进度
      *
-     * @param percent 各个成分的百分比
+     * @param percentMap 各个成分的百分比
      */
-    public void setData(HashMap<Double,Color> percent) {
+    public void initData(ArrayList<PartBean>percentMap) {
+        for (PartBean partBean :percentMap) {
+            PiePartBean piePartBean = new PiePartBean();
+            piePartBean.percent = partBean.part;
+            piePartBean.color = partBean.color;
+
+            piePartBean.radius = mRadius;
+
+            piePartBeanArrayList.add(piePartBean);
+            //end点是用来不断刷新的
+        }
+
+
+
+        freshData();
+
+    }
+
+    private void freshData() {
+
+       postDelayed(new Runnable() {
+           @Override
+           public void run() {
+                 percent+=mIncrease;
+               for(int i = 0;i<piePartBeanArrayList.size();i++){
+                   //每个扇形part 划过的角度
+                   if(percent<piePartBeanArrayList.get(i).percent) {
+                       //如果累加百分比还没有到就
+                       piePartBeanArrayList.get(i).moveArc = (int)(percent*360);
+                   }else{
+                       //最终形态：扇形的区块角度 = percent*360.
+                       piePartBeanArrayList.get(i).moveArc = (int)(piePartBeanArrayList.get(i).percent*360);
+                   }
+
+                   //每个扇形的起始角度
+                   if(i==0) {
+                       piePartBeanArrayList.get(i).startArc = -90;
+                   }else{
+                       int totalArc=0;
+                       for(int j=0;j<i;j++){
+                           totalArc +=piePartBeanArrayList.get(i).moveArc;
+
+                       }
+                       piePartBeanArrayList.get(i).startArc =-90+totalArc;
+                   }
+
+
+
+
+
+
+
+
+
+//                   if(percent<piePartBeanArrayList.get(i).percent)
+//                   piePartBeanArrayList.get(i).arc =  (int)(percent*360);//不断增加每部分圆弧的弧度
+//                   totalArc+=piePartBeanArrayList.get(i).arc;
+//                   piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
+//                   piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
+//Log.d(TAG,"1:"+piePartBeanArrayList.get(i).arc);
+//Log.d(TAG,"2:"+piePartBeanArrayList.get(i).percent);
+//Log.d(TAG,"3:"+piePartBeanArrayList.get(i).radius);
+//Log.d(TAG,"1:"+piePartBeanArrayList.get(i).endPointX);
+//Log.d(TAG,"1:"+piePartBeanArrayList.get(i).endPointY);
+//Log.d(TAG,"1:"+piePartBeanArrayList.get(i).color);
+
+
+               }
+               if(totalArc<360) {
+                   Log.d(TAG,"invalidate"+totalArc);
+                   invalidateAndFreshData();
+               }
+
+           }
+       },6);
+
+    }
+
+    private void invalidateAndFreshData() {
+        invalidate();
+        freshData();
 
     }
 }
