@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
              dataMap.add(new PartBean(0.1d, Color.BLACK));
              dataMap.add(new PartBean(0.2d, Color.GREEN));
              dataMap.add(new PartBean(0.3d, Color.YELLOW));
-             dataMap.add(new PartBean(0.15d, Color.RED));
-             dataMap.add(new PartBean(0.25d, Color.BLUE));
+             dataMap.add(new PartBean(0.3d, Color.RED));
+             dataMap.add(new PartBean(0.1d, Color.BLUE));
              Log.d(TAG,"dataMap"+dataMap.size());
              pieChartView.initData(dataMap);
          }

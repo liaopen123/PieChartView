@@ -2,6 +2,7 @@ package com.xiaoziqianbao.piechartview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
@@ -24,11 +25,12 @@ public class PieChartView extends View {
     private Point centerPoint ;//圆心
     private int mRadius;
     private Paint paint;
-    private double mIncrease = 0.001d;
-    double percent = 0;//初始化百分比
-    public int totalArc=0;
+    private double mIncrease = 0.01d;
+    double mCurrentPercent = 0;//初始化百分比
     private RectF rectF = new RectF();//圆所对应的弧
     private ArrayList<PiePartBean> piePartBeanArrayList = new ArrayList<>();
+    private static int totalArc1 = 0;
+    private boolean Running = true;
 
     public PieChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,11 +66,18 @@ public class PieChartView extends View {
 
         for(int i = 0;i<piePartBeanArrayList.size();i++){
            // Log.d(TAG,"i="+i+"piePartBeanArrayList.get(i).arc"+piePartBeanArrayList.get(i).arc+"piePartBeanArrayList.get(i).endPoint"+piePartBeanArrayList.get(i).endPointX);
+            paint.setColor(piePartBeanArrayList.get(i).color);
             canvas.drawArc(rectF,piePartBeanArrayList.get(i).startArc,piePartBeanArrayList.get(i).moveArc,true,paint);
             Log.d(TAG,i+"..."+piePartBeanArrayList.get(i).startArc+"....."+piePartBeanArrayList.get(i).moveArc);
-            paint.setColor(piePartBeanArrayList.get(i).color);
+
             paint.setStrokeWidth(10);
-         //   canvas.drawLine(centerPoint.x,centerPoint.y,piePartBeanArrayList.get(i).endPointX,piePartBeanArrayList.get(i).endPointY,paint);
+            if(i==0){
+                paint.setColor(Color.WHITE);
+                canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+            }else {
+                paint.setColor(Color.WHITE);
+                canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+            }
         }
 
     }
@@ -81,10 +90,10 @@ public class PieChartView extends View {
      * @param percentMap 各个成分的百分比
      */
     public void initData(ArrayList<PartBean>percentMap) {
-        for (PartBean partBean :percentMap) {
+        for (int i= 0;i< percentMap.size() ;i++) {    //不能用foreach    它的输出是乱序的
             PiePartBean piePartBean = new PiePartBean();
-            piePartBean.percent = partBean.part;
-            piePartBean.color = partBean.color;
+            piePartBean.percent = percentMap.get(i).part;
+            piePartBean.color =  percentMap.get(i).color;
 
             piePartBean.radius = mRadius;
 
@@ -101,37 +110,41 @@ public class PieChartView extends View {
     private void freshData() {
 
        postDelayed(new Runnable() {
+           public int pastTotalArc;
+
            @Override
            public void run() {
-                 percent+=mIncrease;
-               for(int i = 0;i<piePartBeanArrayList.size();i++){
-                   //每个扇形part 划过的角度
-                   if(percent<piePartBeanArrayList.get(i).percent) {
-                       //如果累加百分比还没有到就
-                       piePartBeanArrayList.get(i).moveArc = (int)(percent*360);
-                   }else{
-                       //最终形态：扇形的区块角度 = percent*360.
-                       piePartBeanArrayList.get(i).moveArc = (int)(piePartBeanArrayList.get(i).percent*360);
-                   }
-
-                   //每个扇形的起始角度
-                   if(i==0) {
-                       piePartBeanArrayList.get(i).startArc = -90;
-                   }else{
-                       int totalArc=0;
-                       for(int j=0;j<i;j++){
-                           totalArc +=piePartBeanArrayList.get(i).moveArc;
-
-                       }
-                       piePartBeanArrayList.get(i).startArc =-90+totalArc;
-                   }
-
-
-
-
-
-
-
+               mCurrentPercent+=mIncrease;
+//               totalArc1 = 0;
+               for(int i = 0;i<piePartBeanArrayList.size();i++) {
+//                   //每个扇形part 划过的角度
+//                   if(percent<piePartBeanArrayList.get(i).percent) {
+//                       //如果累加百分比还没有到就
+//                      Log.d(TAG,"i="+i+"还没有达到最终形态");
+//                       piePartBeanArrayList.get(i).moveArc = (int)(percent*360);
+//                   }else{
+//                       //最终形态：扇形的区块角度 = percent*360.
+//                       piePartBeanArrayList.get(i).moveArc = (int)(piePartBeanArrayList.get(i).percent*360);
+//                       totalArc1+=piePartBeanArrayList.get(i).moveArc;
+//                       Log.d(TAG,"i="+i+"已经达到最终形态，角度和为："+totalArc1);
+//                       if(totalArc1>=360){
+//                           Running = false;
+//                       }else{
+//                           Running = true;
+//                       }
+//                   }
+//
+//                   //每个扇形的起始角度
+//                   if(i==0) {
+//                       piePartBeanArrayList.get(i).startArc = -90;
+//                   }else{
+//                        totalArc=0;
+//                       for(int j=0;j<i;j++){
+//                           totalArc +=piePartBeanArrayList.get(j).moveArc;
+//
+//                       }
+//                       piePartBeanArrayList.get(i).startArc =-90+totalArc;
+//                   }
 
 
 //                   if(percent<piePartBeanArrayList.get(i).percent)
@@ -145,13 +158,54 @@ public class PieChartView extends View {
 //Log.d(TAG,"1:"+piePartBeanArrayList.get(i).endPointX);
 //Log.d(TAG,"1:"+piePartBeanArrayList.get(i).endPointY);
 //Log.d(TAG,"1:"+piePartBeanArrayList.get(i).color);
+                   /**先判断satarArc  再判断moveArc*/
+                   if (i == 0){
+                       //第一个arc的起始角度 startArc = -90°
+                       piePartBeanArrayList.get(i).startArc = -90;
+                       //再判断moveArc
+                       if(mCurrentPercent<piePartBeanArrayList.get(i).percent){
+                           //还没有达到上限百分比
+                           piePartBeanArrayList.get(i).moveArc =(int) (mCurrentPercent*360);
+                       }else{
+                           Log.d(TAG,"第"+i+"个达到上限");
+                           piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
+                       }
+                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * (piePartBeanArrayList.get(i).startArc+90)/ 180));
+                       piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * (piePartBeanArrayList.get(i).startArc+90)/ 180));
+                   }else{
+                       //第2,3,4....part
+                        pastTotalArc = 0;//之前arc所划过的角度
+                     for (int j= 0;j<i;j++){
+                         pastTotalArc+=piePartBeanArrayList.get(j).moveArc;
+                     }
+                       //startArc = -90°+之前arc所划过的角度总和
+                       piePartBeanArrayList.get(i).startArc = -90+pastTotalArc;
+                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
+                   piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
+                       //求i的moveArc
+                       if(mCurrentPercent<piePartBeanArrayList.get(i).percent){
+                           //还没有达到上限百分比
+                           piePartBeanArrayList.get(i).moveArc =(int) (mCurrentPercent*360);
+                       }else{
+                           Log.d(TAG,"第"+i+"个达到上限");
+                           piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
+                           int i1 = piePartBeanArrayList.get(i).moveArc + piePartBeanArrayList.get(i).startArc;
+                           if(i1>=360+(-90)){
+                               //此处需要invalidate  不然会出现微小空缺。
+                               invalidate();
+                               Running = false;
+                           }
+                       }
+                   }
 
 
                }
-               if(totalArc<360) {
-                   Log.d(TAG,"invalidate"+totalArc);
+
+               if(Running) {
+                   Log.d(TAG, "invalidate" + totalArc1);
                    invalidateAndFreshData();
                }
+
 
            }
        },6);
