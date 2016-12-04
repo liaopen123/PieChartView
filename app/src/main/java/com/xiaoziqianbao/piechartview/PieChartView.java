@@ -55,6 +55,7 @@ public class PieChartView extends View {
         rectF.bottom = centerPoint.y + mRadius; // 右下角y
         paint = new Paint();
         paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
     }
 
     @Override
@@ -85,6 +86,11 @@ public class PieChartView extends View {
             }
         }
 
+
+if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已经画圆
+    //画圆心
+    canvas.drawCircle(centerPoint.x, centerPoint.y, mRadius / 2.5f, paint);
+}
     }
 
 
