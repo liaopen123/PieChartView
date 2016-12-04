@@ -70,13 +70,18 @@ public class PieChartView extends View {
             canvas.drawArc(rectF,piePartBeanArrayList.get(i).startArc,piePartBeanArrayList.get(i).moveArc,true,paint);
             Log.d(TAG,i+"..."+piePartBeanArrayList.get(i).startArc+"....."+piePartBeanArrayList.get(i).moveArc);
 
+            //画线
             paint.setStrokeWidth(10);
             if(i==0){
                 paint.setColor(Color.WHITE);
+
                 canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
             }else {
                 paint.setColor(Color.WHITE);
                 canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+            }
+            if(i==piePartBeanArrayList.size()-1){
+                canvas.drawLine(centerPoint.x, centerPoint.y, centerPoint.x, centerPoint.y-mRadius, paint);
             }
         }
 
@@ -169,9 +174,10 @@ public class PieChartView extends View {
                        }else{
                            Log.d(TAG,"第"+i+"个达到上限");
                            piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
+                           piePartBeanArrayList.get(i).drawLine = true;
                        }
-                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * (piePartBeanArrayList.get(i).startArc+90)/ 180));
-                       piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * (piePartBeanArrayList.get(i).startArc+90)/ 180));
+                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * piePartBeanArrayList.get(i).percent*360/ 180));
+                       piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * piePartBeanArrayList.get(i).percent*360/ 180));
                    }else{
                        //第2,3,4....part
                         pastTotalArc = 0;//之前arc所划过的角度
@@ -180,8 +186,8 @@ public class PieChartView extends View {
                      }
                        //startArc = -90°+之前arc所划过的角度总和
                        piePartBeanArrayList.get(i).startArc = -90+pastTotalArc;
-                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
-                   piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * piePartBeanArrayList.get(i).startArc/ 180));
+                       piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * pastTotalArc/ 180));
+                   piePartBeanArrayList.get(i).endPointY = (int) (centerPoint.y - mRadius * Math.cos(Math.PI * pastTotalArc/ 180));
                        //求i的moveArc
                        if(mCurrentPercent<piePartBeanArrayList.get(i).percent){
                            //还没有达到上限百分比
@@ -190,6 +196,7 @@ public class PieChartView extends View {
                            Log.d(TAG,"第"+i+"个达到上限");
                            piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
                            int i1 = piePartBeanArrayList.get(i).moveArc + piePartBeanArrayList.get(i).startArc;
+                           piePartBeanArrayList.get(i).drawLine = true;
                            if(i1>=360+(-90)){
                                //此处需要invalidate  不然会出现微小空缺。
                                invalidate();

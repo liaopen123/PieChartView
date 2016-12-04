@@ -14,4 +14,5 @@ public class PiePartBean {
     int radius;//扇形所对圆的半径
     public  int startArc;//
     public int moveArc;//划过的角度
+    public boolean drawLine = false;
 }
