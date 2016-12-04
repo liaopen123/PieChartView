@@ -72,23 +72,26 @@ public class PieChartView extends View {
             Log.d(TAG,i+"..."+piePartBeanArrayList.get(i).startArc+"....."+piePartBeanArrayList.get(i).moveArc);
 
             //画线
-            paint.setStrokeWidth(10);
-            if(i==0){
-                paint.setColor(Color.WHITE);
+            if(piePartBeanArrayList.get(i).drawLine) {
+                paint.setStrokeWidth(10);
+                if (i == 0) {
+                    paint.setColor(Color.WHITE);
 
-                canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
-            }else {
-                paint.setColor(Color.WHITE);
-                canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
-            }
-            if(i==piePartBeanArrayList.size()-1){
-                canvas.drawLine(centerPoint.x, centerPoint.y, centerPoint.x, centerPoint.y-mRadius, paint);
+                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+                } else {
+                    paint.setColor(Color.WHITE);
+                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+                }
+                if (i == piePartBeanArrayList.size() - 1) {
+                    canvas.drawLine(centerPoint.x, centerPoint.y, centerPoint.x, centerPoint.y - mRadius, paint);
+                }
             }
         }
 
 
 if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已经画圆
     //画圆心
+    paint.setColor(Color.WHITE);
     canvas.drawCircle(centerPoint.x, centerPoint.y, mRadius / 2.5f, paint);
 }
     }

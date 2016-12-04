@@ -24,10 +24,11 @@ public class MainActivity extends AppCompatActivity {
          public void onClick(View view) {
              ArrayList<PartBean> dataMap = new ArrayList<>();
 
-             dataMap.add(new PartBean(0.2d, Color.BLACK));
+             dataMap.add(new PartBean(0.1d, Color.BLACK));
              dataMap.add(new PartBean(0.2d, Color.GREEN));
-             dataMap.add(new PartBean(0.2d, Color.YELLOW));
-             dataMap.add(new PartBean(0.4d, Color.RED));
+             dataMap.add(new PartBean(0.3d, Color.YELLOW));
+             dataMap.add(new PartBean(0.15d, Color.RED));
+             dataMap.add(new PartBean(0.25d, Color.BLUE));
 
              Log.d(TAG,"dataMap"+dataMap.size());
              pieChartView.initData(dataMap);
