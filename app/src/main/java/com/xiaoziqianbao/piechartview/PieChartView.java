@@ -72,20 +72,20 @@ public class PieChartView extends View {
             Log.d(TAG,i+"..."+piePartBeanArrayList.get(i).startArc+"....."+piePartBeanArrayList.get(i).moveArc);
 
             //画线
-            if(piePartBeanArrayList.get(i).drawLine) {
-                paint.setStrokeWidth(10);
-                if (i == 0) {
-                    paint.setColor(Color.WHITE);
-
-                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
-                } else {
-                    paint.setColor(Color.WHITE);
-                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
-                }
-                if (i == piePartBeanArrayList.size() - 1) {
-                    canvas.drawLine(centerPoint.x, centerPoint.y, centerPoint.x, centerPoint.y - mRadius, paint);
-                }
-            }
+//            if(piePartBeanArrayList.get(i).drawLine) {
+//                paint.setStrokeWidth(10);
+//                if (i == 0) {
+//                    paint.setColor(Color.WHITE);
+//
+//                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+//                } else {
+//                    paint.setColor(Color.WHITE);
+//                    canvas.drawLine(centerPoint.x, centerPoint.y, piePartBeanArrayList.get(i).endPointX, piePartBeanArrayList.get(i).endPointY, paint);
+//                }
+//                if (i == piePartBeanArrayList.size() - 1) {
+//                    canvas.drawLine(centerPoint.x, centerPoint.y, centerPoint.x, centerPoint.y - mRadius, paint);
+//                }
+//            }
         }
 
 
@@ -124,7 +124,7 @@ if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已�
     private void freshData() {
 
        postDelayed(new Runnable() {
-           public int pastTotalArc;
+           public float pastTotalArc;
 
            @Override
            public void run() {
@@ -179,10 +179,12 @@ if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已�
                        //再判断moveArc
                        if(mCurrentPercent<piePartBeanArrayList.get(i).percent){
                            //还没有达到上限百分比
-                           piePartBeanArrayList.get(i).moveArc =(int) (mCurrentPercent*360);
+                           piePartBeanArrayList.get(i).moveArc =(float) (mCurrentPercent*360);
+                           Log.d(TAG,"第"+i+"个所划角度："+piePartBeanArrayList.get(i).moveArc);
                        }else{
                            Log.d(TAG,"第"+i+"个达到上限");
-                           piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
+                           piePartBeanArrayList.get(i).moveArc =(float) (piePartBeanArrayList.get(i).percent*360);
+                           Log.d(TAG,"第"+i+"个所划角度："+piePartBeanArrayList.get(i).moveArc);
                            piePartBeanArrayList.get(i).drawLine = true;
                        }
                        piePartBeanArrayList.get(i).endPointX = (int) (centerPoint.x + mRadius * Math.sin(Math.PI * piePartBeanArrayList.get(i).percent*360/ 180));
@@ -192,6 +194,7 @@ if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已�
                         pastTotalArc = 0;//之前arc所划过的角度
                      for (int j= 0;j<i;j++){
                          pastTotalArc+=piePartBeanArrayList.get(j).moveArc;
+                         Log.d(TAG,"第"+i+"个所划角度："+piePartBeanArrayList.get(i).moveArc);
                      }
                        //startArc = -90°+之前arc所划过的角度总和
                        piePartBeanArrayList.get(i).startArc = -90+pastTotalArc;
@@ -200,13 +203,18 @@ if(piePartBeanArrayList.size()!=0) {///防止一进界面未设置数据 就已�
                        //求i的moveArc
                        if(mCurrentPercent<piePartBeanArrayList.get(i).percent){
                            //还没有达到上限百分比
-                           piePartBeanArrayList.get(i).moveArc =(int) (mCurrentPercent*360);
+                           Log.d(TAG,"第"+i+"个没有达到上限");
+                           piePartBeanArrayList.get(i).moveArc =(float) (mCurrentPercent*360);
                        }else{
                            Log.d(TAG,"第"+i+"个达到上限");
-                           piePartBeanArrayList.get(i).moveArc =(int) (piePartBeanArrayList.get(i).percent*360);
-                           int i1 = piePartBeanArrayList.get(i).moveArc + piePartBeanArrayList.get(i).startArc;
+                           piePartBeanArrayList.get(i).moveArc =(float) (piePartBeanArrayList.get(i).percent*360);
+                           float i1 = piePartBeanArrayList.get(i).moveArc + piePartBeanArrayList.get(i).startArc;
+                           Log.d(TAG,"moveArc"+piePartBeanArrayList.get(i).moveArc+"startArc"+piePartBeanArrayList.get(i).startArc);
                            piePartBeanArrayList.get(i).drawLine = true;
+                           Log.d(TAG,"I1"+i1);
+
                            if(i1>=360+(-90)){
+
                                //此处需要invalidate  不然会出现微小空缺。
                                invalidate();
                                Running = false;
